@@ -15,10 +15,33 @@ import (
 	"github.com/function61/holepunch-server/pkg/reverseproxy"
 	"github.com/function61/holepunch-server/pkg/sshserverportforward"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+const DefaultCfgFile = "/etc/axfr.net/holepunch-server.yaml"
+
 func main() {
+	viper.SetConfigFile(DefaultCfgFile)
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf("Could not load config %s: Error: %v", DefaultCfgFile, err)
+	}
+
+	logfile := viper.GetString("log.file")
+	if logfile != "" {
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   logfile,
+			MaxSize:    20,
+			MaxBackups: 3,
+			MaxAge:     14,
+		})
+	} else {
+		log.Fatalf("Error: standard log (key log.file) not specified")
+	}
+
 	app := &cobra.Command{
 		Use:     os.Args[0],
 		Short:   "holepunch-server",
@@ -27,6 +50,7 @@ func main() {
 
 	app.AddCommand(serverEntry())
 
+	logex.RedirectGlobalStdLog(log.Default())
 	osutil.ExitIfError(app.Execute())
 }
 

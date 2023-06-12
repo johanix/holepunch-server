@@ -19,6 +19,7 @@ func Register(mux *http.ServeMux, logger *log.Logger) {
 
 	reverseProxy := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
+			logl.Error.Printf("Connection attempt from %v", req)
 			destinationPort, err := destinationPortFromVirtualHost(req.Host)
 			if err != nil {
 				logl.Error.Println(err.Error())
@@ -40,7 +41,8 @@ var destinationPortRe = regexp.MustCompile(`^([0-9]+)\.`)
 func destinationPortFromVirtualHost(virtualHost string) (int, error) {
 	matches := destinationPortRe.FindStringSubmatch(virtualHost)
 	if matches == nil {
-		return 0, errors.New("failed to determine destination port from vhost")
+		// return 0, errors.New("failed to determine destination port from vhost")
+		return 0, fmt.Errorf("failed to determine destination port from vhost: '%s'", virtualHost)
 	}
 
 	destinationPort, err := strconv.Atoi(matches[1])

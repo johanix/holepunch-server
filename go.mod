@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/spf13/cobra v0.0.3
-	github.com/spf13/pflag v1.0.3 // indirect
-	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
+	github.com/spf13/viper v1.16.0
+	golang.org/x/crypto v0.9.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
